@@ -38,7 +38,7 @@ class EpisodeListController {
       let pupList;
 
       // const RefetchInSixHours = 1000 * 3600 * 6;
-      const RefetchInSixHours = 1000 * 3600 * 1;
+      const RefetchInSixHours = 200 * 3600;
 
       while (Date.now()) {
         pupList = await page.evaluate(async () => {
