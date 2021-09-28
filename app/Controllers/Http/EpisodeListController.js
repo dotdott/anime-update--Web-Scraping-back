@@ -37,7 +37,8 @@ class EpisodeListController {
 
       let pupList;
 
-      const RefetchInSixHours = 1000 * 3600 * 6;
+      // const RefetchInSixHours = 1000 * 3600 * 6;
+      const RefetchInSixHours = 1000 * 3600 * 1;
 
       while (Date.now()) {
         pupList = await page.evaluate(async () => {
@@ -58,15 +59,13 @@ class EpisodeListController {
               const episode_link = item.querySelector(".poster a").href;
               const last_update = new Date().toLocaleString();
 
-              if (formattedArray.length > 0) {
-                const checkIfDataIsAlreadyInArray = formattedArray.every(
-                  (lastUpdats) => lastUpdats.name === name
-                );
-                if (checkIfDataIsAlreadyInArray) {
-                  console.log("ja existe");
-                  return;
-                }
-              }
+              // if (formattedArray.length > 0) {
+              //   const checkIfDataIsAlreadyInArray = formattedArray.every(
+              //     (lastUpdats) => lastUpdats.name === name
+              //   );
+
+              //   if (checkIfDataIsAlreadyInArray) return;
+              // }
 
               formattedArray.push({
                 img_src,
