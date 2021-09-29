@@ -100,11 +100,11 @@ class EpisodeListController {
           return newArr;
         };
 
-        const formattedArray = handleFormatList();
-        if (formattedArray.length === 0) {
-          throw new Error();
-        }
-        const updatedList = await EpisodesList.createMany(formattedArray);
+        // const formattedArray = handleFormatList();
+        // if (formattedArray.length === 0) {
+        //   throw new Error();
+        // }
+        const updatedList = await EpisodesList.createMany(pupList);
 
         return response.status(200).send({ updatedList });
       }
