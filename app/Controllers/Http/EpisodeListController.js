@@ -35,11 +35,9 @@ class EpisodeListController {
         waitUntil: "networkidle2",
       });
 
-      let pupList;
-
       // const RefetchInSixHours = 1000 * 3600 * 6;
-      const RefetchInSixHours = 200 * 3600;
-
+      const RefetchInSixHours = 3600;
+      let pupList;
       while (Date.now()) {
         pupList = await page.evaluate(async () => {
           const lastEpisodesList = document.querySelectorAll(
@@ -81,40 +79,38 @@ class EpisodeListController {
             return formattedArray;
           }
         });
+        await page.waitForTimeout(1000 * 1000);
+
+        const handleFormatList = () => {
+          let newArr = [];
+
+          pupList.map((item) => {
+            const alreadyInDatabase = data.some(
+              (dataItem) =>
+                dataItem.name === item.name && dataItem.episode === item.episode
+            );
+
+            if (!alreadyInDatabase) {
+              return newArr.push(item);
+            }
+
+            return;
+          });
+
+          return newArr;
+        };
+
+        const formattedArray = handleFormatList();
+        if (formattedArray.length === 0) {
+          throw new Error();
+        }
+        const updatedList = await EpisodesList.createMany(formattedArray);
+
+        return response.status(200).send({ updatedList });
       }
-      await page.waitForTimeout(RefetchInSixHours);
-
-      const handleFormatList = () => {
-        let newArr = [];
-
-        pupList.map((item) => {
-          const alreadyInDatabase = data.some(
-            (dataItem) =>
-              dataItem.name === item.name && dataItem.episode === item.episode
-          );
-
-          if (!alreadyInDatabase) {
-            return newArr.push(item);
-          }
-
-          return;
-        });
-
-        return newArr;
-      };
-
-      const formattedArray = handleFormatList();
-      if (formattedArray.length === 0) {
-        throw new Error();
-      }
-
-      const updatedList = await EpisodesList.createMany(pupList);
-
-      return response.status(200).send({ updatedList });
     } catch (error) {
-      return response
-        .status(400)
-        .send({ error: "error when trying to refetch new data" });
+      return response.status(400).send({ error });
+      // .send({ error: "error when trying to refetch new data" });
     }
   }
 }
