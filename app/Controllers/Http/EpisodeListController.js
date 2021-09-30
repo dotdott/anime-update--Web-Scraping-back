@@ -76,7 +76,7 @@ class EpisodeListController {
           return formattedArray;
         }
       });
-      await page.waitForTimeout(1000 * 1000);
+      // await page.waitForTimeout(1000 * 1000);
 
       const handleFormatList = () => {
         let newArr = [];
