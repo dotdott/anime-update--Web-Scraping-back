@@ -37,77 +37,73 @@ class EpisodeListController {
 
       // const RefetchInSixHours = 1000 * 3600 * 6;
       const RefetchInSixHours = 3600;
-      let pupList;
-      while (Date.now()) {
-        pupList = await page.evaluate(async () => {
-          const lastEpisodesList = document.querySelectorAll(
-            ".animation-2.items .item.se.episodes"
-          );
 
-          const episodesArray = [...lastEpisodesList];
-          const formattedArray = [];
+      const pupList = await page.evaluate(async () => {
+        const lastEpisodesList = document.querySelectorAll(
+          ".animation-2.items .item.se.episodes"
+        );
 
-          if (episodesArray.length > 0) {
-            episodesArray.map(async (item) => {
-              const img_src = item
-                .querySelector("img")
-                .getAttribute("data-src");
-              const name = item.querySelector(".data h3 a").innerHTML;
-              const episode = item.querySelector(".data span").innerHTML;
-              const episode_link = item.querySelector(".poster a").href;
-              const last_update = new Date().toLocaleString();
+        const episodesArray = [...lastEpisodesList];
+        const formattedArray = [];
 
-              // if (formattedArray.length > 0) {
-              //   const checkIfDataIsAlreadyInArray = formattedArray.every(
-              //     (lastUpdats) => lastUpdats.name === name
-              //   );
+        if (episodesArray.length > 0) {
+          episodesArray.map(async (item) => {
+            const img_src = item.querySelector("img").getAttribute("data-src");
+            const name = item.querySelector(".data h3 a").innerHTML;
+            const episode = item.querySelector(".data span").innerHTML;
+            const episode_link = item.querySelector(".poster a").href;
+            const last_update = new Date().toLocaleString();
 
-              //   if (checkIfDataIsAlreadyInArray) return;
-              // }
+            // if (formattedArray.length > 0) {
+            //   const checkIfDataIsAlreadyInArray = formattedArray.every(
+            //     (lastUpdats) => lastUpdats.name === name
+            //   );
 
-              formattedArray.push({
-                img_src,
-                name,
-                episode,
-                episode_link,
-                last_update,
-              });
+            //   if (checkIfDataIsAlreadyInArray) return;
+            // }
 
-              return formattedArray;
+            formattedArray.push({
+              img_src,
+              name,
+              episode,
+              episode_link,
+              last_update,
             });
 
             return formattedArray;
-          }
-        });
-        await page.waitForTimeout(1000 * 1000);
-
-        const handleFormatList = () => {
-          let newArr = [];
-
-          pupList.map((item) => {
-            const alreadyInDatabase = data.some(
-              (dataItem) =>
-                dataItem.name === item.name && dataItem.episode === item.episode
-            );
-
-            if (!alreadyInDatabase) {
-              return newArr.push(item);
-            }
-
-            return;
           });
 
-          return newArr;
-        };
+          return formattedArray;
+        }
+      });
+      await page.waitForTimeout(1000 * 1000);
 
-        // const formattedArray = handleFormatList();
-        // if (formattedArray.length === 0) {
-        //   throw new Error();
-        // }
-        const updatedList = await EpisodesList.createMany(pupList);
+      const handleFormatList = () => {
+        let newArr = [];
 
-        return response.status(200).send({ updatedList });
-      }
+        pupList.map((item) => {
+          const alreadyInDatabase = data.some(
+            (dataItem) =>
+              dataItem.name === item.name && dataItem.episode === item.episode
+          );
+
+          if (!alreadyInDatabase) {
+            return newArr.push(item);
+          }
+
+          return;
+        });
+
+        return newArr;
+      };
+
+      // const formattedArray = handleFormatList();
+      // if (formattedArray.length === 0) {
+      //   throw new Error();
+      // }
+      const updatedList = await EpisodesList.createMany(pupList);
+
+      return response.status(200).send({ updatedList });
     } catch (error) {
       return response.status(400).send({ error });
       // .send({ error: "error when trying to refetch new data" });
