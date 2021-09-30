@@ -28,15 +28,11 @@ class EpisodeListController {
 
       const { data } = list.toJSON();
 
-      // const browser = await puppeteer.launch({ headless: false });
       const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
       const page = await browser.newPage();
       await page.goto("https://animesup.biz/", {
         waitUntil: "networkidle2",
       });
-
-      // const RefetchInSixHours = 1000 * 3600 * 6;
-      const RefetchInSixHours = 3600;
 
       const pupList = await page.evaluate(async () => {
         const lastEpisodesList = document.querySelectorAll(
@@ -54,13 +50,13 @@ class EpisodeListController {
             const episode_link = item.querySelector(".poster a").href;
             const last_update = new Date().toLocaleString();
 
-            // if (formattedArray.length > 0) {
-            //   const checkIfDataIsAlreadyInArray = formattedArray.every(
-            //     (lastUpdats) => lastUpdats.name === name
-            //   );
+            if (formattedArray.length > 0) {
+              const checkIfDataIsAlreadyInArray = formattedArray.every(
+                (lastUpdats) => lastUpdats.name === name
+              );
 
-            //   if (checkIfDataIsAlreadyInArray) return;
-            // }
+              if (checkIfDataIsAlreadyInArray) return;
+            }
 
             formattedArray.push({
               img_src,
@@ -76,7 +72,6 @@ class EpisodeListController {
           return formattedArray;
         }
       });
-      // await page.waitForTimeout(1000 * 1000);
 
       const handleFormatList = () => {
         let newArr = [];
@@ -97,16 +92,21 @@ class EpisodeListController {
         return newArr;
       };
 
-      // const formattedArray = handleFormatList();
-      // if (formattedArray.length === 0) {
-      //   throw new Error();
-      // }
+      const formattedArray = handleFormatList();
+      if (formattedArray.length === 0) {
+        throw new Error("Parece que já está tudo atualizado!");
+      }
       const updatedList = await EpisodesList.createMany(pupList);
 
       return response.status(200).send({ updatedList });
     } catch (error) {
-      return response.status(400).send({ error });
-      // .send({ error: "error when trying to refetch new data" });
+      let msg = "Houve um erro ao tentar listar as ultimas atualizações";
+
+      if (error.message === "Parece que já está tudo atualizado!") {
+        msg = error.message;
+      }
+
+      return response.status(400).send({ error: msg });
     }
   }
 }
