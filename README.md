@@ -1,28 +1,10 @@
-# Adonis API application
+## <b>WebScraping application</b>.
 
-This is the boilerplate for creating an API server in AdonisJs, it comes pre-configured with.
+- Build to extract last updates in an anime website and saving in this database.
+- I used google <b>puppeteer</b> to extract the information that i needed whenever the api was called.
+- Has errors handlings ++ data formating and checking if the data that was last fetched was already in the database or not, if so, it will only insert the new data.
 
-1. Bodyparser
-2. Authentication
-3. CORS
-4. Lucid ORM
-5. Migrations and seeds
+## <b>Techs</b>
 
-## Setup
-
-Use the adonis command to install the blueprint
-
-```bash
-adonis new yardstick --api-only
-```
-
-or manually clone the repo and then run `npm install`.
-
-
-### Migrations
-
-Run the following command to run startup migrations.
-
-```js
-adonis migration:run
-```
+- AdonisJS
+- Puppeteer
